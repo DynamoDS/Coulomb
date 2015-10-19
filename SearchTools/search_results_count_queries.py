@@ -21,12 +21,7 @@ if len(sys.argv) != 2:
 
 path = sys.argv[1]
 
-results = []
-
-linesCount = 0
-searchCount = 0
 err = 0;
-
 print time.strftime("%Y-%m-%d %H:%M:%S"), "Starting"
 
 f = open (path)
