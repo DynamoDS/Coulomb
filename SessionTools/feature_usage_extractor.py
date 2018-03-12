@@ -12,6 +12,9 @@ def usesListAtLevel(data):
     usesList = data.find('useLevels="True"') > -1
     return usesList
     
+VERSION="2018-03-12"
+processed = 0
+skipped = 0
 
 
 if len(sys.argv) != 2:
@@ -27,7 +30,18 @@ for root, subdirs, files in os.walk(path):
             continue
         # print (path)
         f = gzip.open (path)
-        fo = open (path + ".features" , 'w')
+        out_path = path + ".features" + "." + VERSION
+
+        print ("processed: " + str(processed)  + ", results_exist: " + str(skipped))
+        
+
+        if os.path.exists(out_path):
+            skipped = skipped + 1
+            continue
+
+        processed = processed + 1
+
+        fo = open (out_path , 'w')
 
         searchMap = {}
         searchNodeAdded = {}
