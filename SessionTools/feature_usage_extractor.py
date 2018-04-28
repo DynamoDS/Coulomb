@@ -30,14 +30,14 @@ for root, subdirs, files in os.walk(path):
         path = join(root,ff)
         if (not path.endswith('sorted.gz')):
             continue
+            
+        print (str(datetime.datetime.now()) + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
 
         out_path = path + ".features" + "." + VERSION
-        print (str(datetime.datetime.now()) + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
-        if os.path.exists(out_path):
+        # skip files that have been processed already
+        if os.path.exists(out_path) and os.path.getmtime(out_path) > os.path.getmtime(path):
             skipped = skipped + 1
             continue
-
-
 
         f = gzip.open (path)
         fo = open (out_path , 'w')
@@ -109,7 +109,7 @@ for root, subdirs, files in os.walk(path):
                         version = ET.fromstring(base64.b64decode(data["Data"])).attrib["Version"]
 
                 if userId == None:
-				    userId = data["UserID"]
+                    userId = data["UserID"]
 
             except Exception as e:
                 print (e)
