@@ -35,6 +35,7 @@ for root, subdirs, files in os.walk(path):
         paths.append(path)
 
 random.shuffle(paths)
+print ('Paths to process: ' + str(len(paths)))
 
 for path in paths:            
     print (str(datetime.datetime.now()) + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
