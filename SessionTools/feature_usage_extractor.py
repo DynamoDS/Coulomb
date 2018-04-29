@@ -14,7 +14,7 @@ def usesListAtLevel(data):
     usesList = data.find('useLevels="True"') > -1
     return usesList
     
-VERSION="2018-04-27"
+VERSION="2018-04-29"
 processed = 0
 skipped = 0
 err_count = 0
@@ -27,8 +27,14 @@ path = sys.argv[1]
 
 paths = []
 
+i = 0
+
+print ('Enumerating files')
 for root, subdirs, files in os.walk(path):
     for ff in files:
+        i = i + 1
+        if i % 1000 == 0:
+            print (i)
         path = join(root,ff)
         if (not path.endswith('sorted.gz')):
             continue
@@ -45,51 +51,45 @@ for path in paths:
     if os.path.exists(out_path) and os.path.getmtime(out_path) > os.path.getmtime(path):
         skipped = skipped + 1
         continue
+    
+    try:
+        f = gzip.open (path)
+        fo = open (out_path , 'w')
+        processed = processed + 1
+        searchMap = {}
+        searchNodeAdded = {}
+        tags = set()
+        usageMap = { # When adding features here, don't forget to add below as well
+            "ListAtLevel": False
+        }
+        userId = None
+        version = None
+        sessionStartMicroTime = 0
+        sessionEndMicroTime = 0
+        sessionDate = ''
 
-    f = gzip.open (path)
-    fo = open (out_path , 'w')
-
-    processed = processed + 1
-
-
-    searchMap = {}
-    searchNodeAdded = {}
-    tags = set()
-
-    usageMap = { # When adding features here, don't forget to add below as well
-        "ListAtLevel": False
-    }
-
-    userId = None
-    version = None
-    sessionStartMicroTime = 0
-    sessionEndMicroTime = 0
-    sessionDate = ''
-
-    def writeDataToFile():
-        print (json.dumps(
-            {
-                "Searches" : searchMap,
-                "SearchesNodeAdded" : searchNodeAdded,
-                "Tags" : list(tags),
-                "UsageMap" : usageMap,
-                "UserID": userId,
-                "WorkspaceVersion": version,
-                "SessionDuration": sessionEndMicroTime - sessionStartMicroTime,
-                "Date": sessionDate
-            }), file=fo)
-
-    for ln in f:
-        if ln.startswith("Downloading phase"):
-            continue
-        try:
+        def writeDataToFile():
+            print (json.dumps(
+                {
+                    "Searches" : searchMap,
+                    "SearchesNodeAdded" : searchNodeAdded,
+                    "Tags" : list(tags),
+                    "UsageMap" : usageMap,
+                    "UserID": userId,
+                    "WorkspaceVersion": version,
+                    "SessionDuration": sessionEndMicroTime - sessionStartMicroTime,
+                    "Date": sessionDate
+                }), file=fo)
+        for ln in f:
+            if ln.startswith("Downloading phase"):
+                continue
             data = json.loads(ln)
 
             if sessionStartMicroTime == 0:
                 sessionStartMicroTime = int(data["MicroTime"])
                 sessionDate = data["DateTime"].split(" ")[0]
             if sessionDate != data["DateTime"].split(" ")[0]:
-                print ("File " + ff + " has session over multiple days")
+                print (path + " has session over multiple days")
                 # Split the session: write session so far to file, then reset data collection.
                 writeDataToFile()
                 searchMap = {}
@@ -113,14 +113,17 @@ for path in paths:
             if data["Tag"] == "Workspace":
                 usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevel(base64.b64decode(data["Data"]))
                 if (version == None):
-                    version = ET.fromstring(base64.b64decode(data["Data"])).attrib["Version"]
-
+                    b64decodedData = base64.b64decode(data["Data"])
+                    if b64decodedData == '':
+                        continue
+                    et = ET.fromstring(b64decodedData)
+                    version = et.attrib["Version"]
             if userId == None:
                 userId = data["UserID"]
-
-        except Exception as e:
-            print (e)
-            print (ff)
-            err_count = err_count + 1
+    except Exception as e:
+        print (e)
+        print (path)
+        err_count = err_count + 1
+        continue
 
     writeDataToFile()
