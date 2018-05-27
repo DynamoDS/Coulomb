@@ -89,7 +89,7 @@ err = 0;
 log("Start")
 
 
-files = [ f for f in listdir(path) if isfile(join(path,f)) ]
+files = [ f for f in sorted(listdir(path)) if isfile(join(path,f)) ]
 sessions_maps = {}
 byte_counter = 0
 
