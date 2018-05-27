@@ -45,6 +45,14 @@ def flush(outpath, session_maps):
         for ln in session_maps[session]:
             o.write(ln)
         o.flush()
+
+        f = open(completedInputListPath, 'a')
+        for filePath in completedInputFiles_buffer:
+            completedInputFiles.add(filePath)
+            f.write(filePath + "\n")
+        f.flush()
+        completedInputFiles_buffer.clear()
+
     log ("Flushing complete. Total sessions:\t" + str(len(sessionIDSet)) + "\tTotal new sessions:\t" + str(len(newSessionIDSet)))
 
 
@@ -62,7 +70,7 @@ if os.path.exists(completedInputListPath):
     for ln in open(completedInputListPath, 'r'):
         completedInputFiles.add(ln.strip())
 
-
+completedInputFiles_buffer = set()
 # existingOutFiles = [ f for f in listdir(outPath) if isfile(join(outPath,f)) ]
 
 # if len(existingOutFiles) > 1:
@@ -82,15 +90,15 @@ log("Start")
 
 
 files = [ f for f in listdir(path) if isfile(join(path,f)) ]
+sessions_maps = {}
+byte_counter = 0
+
 for filePath in files:
     if filePath in completedInputFiles:
         log ("Already processed: " + filePath)
         completedInputFiles.add(filePath)
         continue
     f = gzip.open (join(path,filePath));
-    sessions_maps = {}
-
-    byte_counter = 0
 
     for ln in f:
         linesCount += 1
@@ -125,15 +133,11 @@ for filePath in files:
 
         except:
             err += 1
-    
-    # Flush lines
-    flush(outPath, sessions_maps)
-    sessions_maps.clear()
+    completedInputFiles_buffer.add(filePath)
 
-    completedInputFiles.add(filePath)
-    f = open(completedInputListPath, 'a')
-    f.write(filePath + "\n")
-    f.flush()
+# Flush lines
+flush(outPath, sessions_maps)
+sessions_maps.clear()
 
 log("Done")
 
