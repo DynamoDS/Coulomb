@@ -126,7 +126,7 @@ for filePath in files:
             
             sessions_maps[session].append(ln)
 
-            if byte_counter > 1024 * 1024 * 1024 * 2:
+            if byte_counter > 1024 * 1024 * 1024 * 3:
                 flush(outPath, sessions_maps)
                 sessions_maps.clear()
                 byte_counter = 0
