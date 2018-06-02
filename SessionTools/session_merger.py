@@ -5,6 +5,7 @@ import time
 import sys
 
 VERBOSE = True
+CHECKSUM = False
 
 def log(s):
   if VERBOSE:
@@ -63,14 +64,18 @@ outPaths = {}
 for inPath in inPaths:
   outPaths[inPath] = inPath.replace(inSessionsPath, outSessionsPath)
 
-log('Computing file length checksums')
-inChecksumMap = checksumFiles(inPaths)
-outChecksumMap = checksumFiles(outPaths.itervalues())
+if CHECKSUM:
+  log('Computing file length checksums')
+  inChecksumMap = checksumFiles(inPaths)
+  outChecksumMap = checksumFiles(outPaths.itervalues())
 
 i = 0
 
 log('Moving input files')
 for inPath in inPaths:
+  i += 1
+  log ('Moving: ' + str(i) + " : " + str((100 *i)/len(paths)) + "% " + inPath)
+  
   fin = gzip.open(inPath)
 
   outPath = outPaths[inPath]
@@ -88,14 +93,18 @@ for inPath in inPaths:
   fin.close()
   fout.close()
 
-log('Verifying the checksum of the output files')
-newOutChecksumMap = checksumFiles(outPaths.itervalues())
+if CHECKSUM:
+  log('Verifying the checksum of the output files')
+  newOutChecksumMap = checksumFiles(outPaths.itervalues())
 
-for inPath in inPaths:
-  inChecksum = inChecksumMap[inPath]
-  outChecksum = outChecksumMap[outPaths[inPath]]
-  newOutChecksum = newOutChecksumMap[outPaths[inPath]]
-  if (newOutChecksum != inChecksum + outChecksum):
-    log("Checksum doesn't match for file " + outPaths[inPath] + ": expected " + str(inChecksum + outChecksum) + ", got " + str(newOutChecksum))
-  else:
+  for inPath in inPaths:
+    inChecksum = inChecksumMap[inPath]
+    outChecksum = outChecksumMap[outPaths[inPath]]
+    newOutChecksum = newOutChecksumMap[outPaths[inPath]]
+    if (newOutChecksum != inChecksum + outChecksum):
+      log("Checksum doesn't match for file " + outPaths[inPath] + ": expected " + str(inChecksum + outChecksum) + ", got " + str(newOutChecksum))
+    else:
+      os.remove(inPath)
+else:
+  for inPath in inPaths:
     os.remove(inPath)
