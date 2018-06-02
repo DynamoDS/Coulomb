@@ -93,6 +93,10 @@ for inPath in inPaths:
   fin.close()
   fout.close()
 
+  if not CHECKSUM:
+    os.remove(inPath)
+
+
 if CHECKSUM:
   log('Verifying the checksum of the output files')
   newOutChecksumMap = checksumFiles(outPaths.itervalues())
@@ -105,6 +109,3 @@ if CHECKSUM:
       log("Checksum doesn't match for file " + outPaths[inPath] + ": expected " + str(inChecksum + outChecksum) + ", got " + str(newOutChecksum))
     else:
       os.remove(inPath)
-else:
-  for inPath in inPaths:
-    os.remove(inPath)
