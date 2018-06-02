@@ -74,7 +74,7 @@ i = 0
 log('Moving input files')
 for inPath in inPaths:
   i += 1
-  log ('Moving: ' + str(i) + " : " + str((100 *i)/len(paths)) + "% " + inPath)
+  log ('Moving: ' + str(i) + " : " + str((100 *i)/len(inPaths)) + "% " + inPath)
   
   fin = gzip.open(inPath)
 
