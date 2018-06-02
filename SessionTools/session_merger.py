@@ -36,7 +36,7 @@ def checksumFiles(paths):
     c += 1
 
     if c % 1000 == 0:
-      log ('checksumming' + c + ":" + str(c/len(paths)) )
+      log ('checksumming: ' + str(c) + " : " + str(c/len(paths)) )
     if os.path.isfile(path):
       checksumMap[path] = countLinesInGzipFile(path)
     else:
