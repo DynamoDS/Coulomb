@@ -74,7 +74,7 @@ for path in paths_to_sort_list:
         skipped += 1
         continue
     try:
-        log(path)
+        log(str((100*i) / len(paths_to_sort)) + "%: " + path)
         f = gzip.open(path)
         data_set = set()
         data = []
