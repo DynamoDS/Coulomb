@@ -66,13 +66,20 @@ i = 0
 skipped = 0
 for path in paths_to_sort_list:
     i += 1
-    if i % 1000 == 0:
-        log ("Sorted: " + str(i) + ", " + str(float((100*i)) / len(paths_to_sort)) + ", skipped: " + str(skipped))
     out_path = compute_derived_path(path)
     # skip files that have been processed already between start of the script and now
     if os.path.exists(out_path):
         skipped += 1
+        log ("Sorted: " + str(i) + ", skipped: " + str(skipped))
         continue
+    
+    # Too large for in memory sort
+    if os.stat(path).st_size > 100 * 1000 * 1000:
+        log ("Skipped large file: " + path)
+        skipped +=1
+        log ("Sorted: " + str(i) + ", skipped: " + str(skipped)) 
+        continue
+
     try:
         log(str(float((100*i)) / len(paths_to_sort)) + "%: " + path)
         f = gzip.open(path)
