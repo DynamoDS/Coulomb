@@ -100,6 +100,10 @@ for path in paths_to_sort_list:
 
         sortedF.flush()
         sortedF.close()
-    except:
+    except Exception as e:
         err += 1
+        if os.path.exists(out_path):
+            os.remove(out_path)
+
         log ("Failed: " + str(err))
+        log (str(e))
