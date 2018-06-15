@@ -17,6 +17,9 @@ def log(s):
     if VERBOSE:
         print time.strftime("%Y-%m-%d %H:%M:%S"), s
 
+def compute_derived_path(s):
+    return s[:-3] + ".sorted.gz"
+
 if len(sys.argv) != 2:
     print "Usage: python sort_sessions.py path_to_sessions"
     print "Sort sessions"
@@ -24,29 +27,64 @@ if len(sys.argv) != 2:
 
 path = sys.argv[1]
 
-linesCount = 0
 
+
+paths_to_test = set()
+sorted_paths = set()
+
+linesCount = 0
+paths_count = 0
 for root, subdirs, files in os.walk(path):
     for ff in files:
-        try:
-            path = os.path.join(root, ff)
-            if not path.endswith('.gz'):
-                continue
-            log(path)
-            f = gzip.open(path)
-            data = []
-            for ln in f:
-                data.append(json.loads(ln))
+        paths_count += 1
+        if paths_count % 1000 == 0:
+            log ("Enumerating paths: " + str(paths_count))
+        path = os.path.join(root, ff)
+        if path.endswith('.sorted.gz'):
+            sorted_paths.add(path)
+            continue
+        if not path.endswith('.gz'):
+            continue
+        paths_to_test.add(path)
 
-            data.sort(key=lambda x: int(x["MicroTime"]))
+log ("All paths: " + str(len(paths_to_test)))
+already_sorted = 0
+paths_to_sort = set()
+for test_path in paths_to_test:
+    if compute_derived_path(test_path) in sorted_paths:
+        already_sorted += 1
+        continue
+    paths_to_sort.add(test_path)
 
-            sortedF = gzip.open(os.path.join(root, ff + ".sorted"), 'w')
+log ("Sorting: " + str(len(paths_to_sort)) + ", already sorted: " + str(already_sorted))
 
-            for d in data:
-                sortedF.write(json.dumps(d) + "\n")
+for path in paths_to_sort:            
+    
+    out_path = compute_derived_path(path)
+    # skip files that have been processed already between start of the script and now
+    if os.path.exists(out_path):
+        skipped = skipped + 1
+        continue
+    try:
+        log(path)
+        f = gzip.open(path)
+        data_set = set()
+        data = []
+        for ln in f:
+            data_set.add(ln)
 
-            sortedF.flush()
-            sortedF.close()
-        except:
-            err += 1
-            log ("Failed: " + str(err))
+        for ln in data_set:
+            data.append(json.loads(ln))
+
+        data.sort(key=lambda x: int(x["MicroTime"]))
+
+        sortedF = gzip.open(out_path, 'w')
+
+        for d in data:
+            sortedF.write(json.dumps(d) + "\n")
+
+        sortedF.flush()
+        sortedF.close()
+    except:
+        err += 1
+        log ("Failed: " + str(err))
