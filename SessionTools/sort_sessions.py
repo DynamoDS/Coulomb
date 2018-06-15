@@ -6,6 +6,7 @@ import base64
 import sys
 import traceback
 import time
+import random
 
 import os
 import sys
@@ -58,9 +59,12 @@ for test_path in paths_to_test:
 
 log ("Sorting: " + str(len(paths_to_sort)) + ", already sorted: " + str(already_sorted))
 
+paths_to_sort_list = list(paths_to_sort)
+random.shuffle(paths_to_sort_list)
+
 i = 0
 skipped = 0
-for path in paths_to_sort:
+for path in paths_to_sort_list:
     i += 1
     if i % 1000 == 0:
         log ("Sorted: " + str(i) + ", " + str((100*i) / len(paths_to_sort)) + ", skipped: " + str(skipped))
