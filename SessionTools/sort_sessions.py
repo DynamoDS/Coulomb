@@ -63,11 +63,11 @@ skipped = 0
 for path in paths_to_sort:
     i += 1
     if i % 1000 == 0:
-        log ("Sorted: " + str(i) ", " + str((100*i) / len(paths_to_sort)) + ", skipped: " + str(skipped))
+        log ("Sorted: " + str(i) + ", " + str((100*i) / len(paths_to_sort)) + ", skipped: " + str(skipped))
     out_path = compute_derived_path(path)
     # skip files that have been processed already between start of the script and now
     if os.path.exists(out_path):
-        skipped = skipped + 1
+        skipped += 1
         continue
     try:
         log(path)
