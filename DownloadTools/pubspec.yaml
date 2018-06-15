@@ -1,0 +1,11 @@
+name: analysis_proc
+version: 0.0.1
+description: A simple console application.
+environment:
+  sdk: '>=1.0.0 <2.0.0'
+dependencies:
+  gcloud: any
+  googleapis_auth: any
+  crypto: any
+dev_dependencies:
+  test: '>=0.12.0 <0.13.0'
