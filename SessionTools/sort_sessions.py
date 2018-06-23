@@ -14,6 +14,8 @@ import sys
 VERBOSE = True
 err = 0
 
+MAX_MEM = 1 * 1000 * 1000 * 1000
+
 def log(s):
     if VERBOSE:
         print time.strftime("%Y-%m-%d %H:%M:%S"), s
@@ -73,20 +75,26 @@ for path in paths_to_sort_list:
         log ("Sorted: " + str(i) + ", skipped: " + str(skipped))
         continue
     
-    # Too large for in memory sort
-    if os.stat(path).st_size > 100 * 1000 * 1000:
-        log ("Skipped large file: " + path)
-        skipped +=1
-        log ("Sorted: " + str(i) + ", skipped: " + str(skipped)) 
-        continue
-
     try:
         log(str(float((100*i)) / len(paths_to_sort)) + "%: " + path)
         f = gzip.open(path)
         data_set = set()
         data = []
+        byte_counter = 0
+        skip_file = False
+
         for ln in f:
             data_set.add(ln)
+            byte_counter += sys.getsizeof(ln)
+
+            if byte_counter > MAX_MEM:
+                skip_file = True
+                skipped +=1
+                log ("Skipped large file: " + path)
+                log ("Sorted: " + str(i) + ", skipped: " + str(skipped))
+
+        if skip_file:
+            continue
 
         for ln in data_set:
             data.append(json.loads(ln))
