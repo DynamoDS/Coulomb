@@ -92,6 +92,7 @@ for path in paths_to_sort_list:
                 skipped +=1
                 log ("Skipped large file: " + path)
                 log ("Sorted: " + str(i) + ", skipped: " + str(skipped))
+                break
 
         if skip_file:
             continue
