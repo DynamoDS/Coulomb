@@ -9,16 +9,32 @@ from os.path import isfile, join
 import gzip
 import datetime
 import random
+import traceback
+import sys
 
-def usesListAtLevel(data):
+def usesListAtLevelXML(data):
     usesList = data.find('useLevels="True"') > -1
     return usesList
+
+def usesListAtLevelJSON(data):
+    usesList = data.find('"UseLevels": true') > -1
+    return usesList
     
-VERSION="2018-04-29"
+def getVersionXML(b64decodedData):
+    et = ET.fromstring(b64decodedData)
+    version = et.attrib["Version"]
+    return version
+
+def getVersionJSON(b64decodedData):
+    json_map = json.loads(b64decodedData)
+    if not json_map.has_key("View"):
+        return None
+    return json.loads(b64decodedData)["View"]["Dynamo"]["Version"]
+
+VERSION="2018-07-03"
 processed = 0
 skipped = 0
 err_count = 0
-
 
 if len(sys.argv) != 2:
     print ("Usage: python feature_usage_extractor.py PathToSessions")
@@ -44,7 +60,7 @@ random.shuffle(paths)
 print ('Paths to process: ' + str(len(paths)))
 
 for path in paths:            
-    print (str(datetime.datetime.now()) + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
+    print (str(datetime.datetime.now()) + ": " + path + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
 
     out_path = path + ".features" + "." + VERSION
     # skip files that have been processed already
@@ -103,26 +119,38 @@ for path in paths:
             sessionEndMicroTime = int(data["MicroTime"])
 
             tags.add(data["Tag"])
+            b64decodedData = base64.b64decode(data["Data"])
+
 
             if data["Tag"] == "Search":
-                searchMap[data["MicroTime"]] = base64.b64decode(data["Data"])
+                searchMap[data["MicroTime"]] = b64decodedData
 
             if data["Tag"] == "Search-NodeAdded":
-                searchNodeAdded[data["MicroTime"]] = base64.b64decode(data["Data"])
+                searchNodeAdded[data["MicroTime"]] = b64decodedData
 
             if data["Tag"] == "Workspace":
-                usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevel(base64.b64decode(data["Data"]))
-                if (version == None):
-                    b64decodedData = base64.b64decode(data["Data"])
-                    if b64decodedData == '':
-                        continue
-                    et = ET.fromstring(b64decodedData)
-                    version = et.attrib["Version"]
+                if b64decodedData == '':
+                    continue
+
+                if b64decodedData.startswith("<"):
+                    usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevelXML(b64decodedData)
+                    if (version == None):
+                        version = getVersionXML(b64decodedData)
+                else:
+                    usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevelJSON(b64decodedData)
+                    if (version == None):
+                        version = getVersionJSON(b64decodedData)
+
             if userId == None:
                 userId = data["UserID"]
     except Exception as e:
+        exc_type, exc_value, exc_traceback = sys.exc_info()
         print (e)
         print (path)
+
+        traceback.print_tb(exc_traceback, file=sys.stdout)
+        fo.flush()
+        os.remove(out_path)
         err_count = err_count + 1
         continue
 
