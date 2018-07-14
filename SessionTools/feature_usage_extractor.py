@@ -12,26 +12,10 @@ import random
 import traceback
 import sys
 
-def usesListAtLevelXML(data):
-    usesList = data.find('useLevels="True"') > -1
-    return usesList
-
-def usesListAtLevelJSON(data):
-    usesList = data.find('"UseLevels": true') > -1
-    return usesList
+import features_JSON
+import features_XML
     
-def getVersionXML(b64decodedData):
-    et = ET.fromstring(b64decodedData)
-    version = et.attrib["Version"]
-    return version
-
-def getVersionJSON(b64decodedData):
-    json_map = json.loads(b64decodedData)
-    if not json_map.has_key("View"):
-        return None
-    return json.loads(b64decodedData)["View"]["Dynamo"]["Version"]
-
-VERSION="2018-07-03"
+VERSION="2018-07-15"
 processed = 0
 skipped = 0
 err_count = 0
@@ -132,14 +116,16 @@ for path in paths:
                 if b64decodedData == '':
                     continue
 
+                # Select which feature extraction library to use depending on what version on the file format 
+                feature_lib = None
                 if b64decodedData.startswith("<"):
-                    usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevelXML(b64decodedData)
-                    if (version == None):
-                        version = getVersionXML(b64decodedData)
+                    feature_lib = features_XML
                 else:
-                    usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or usesListAtLevelJSON(b64decodedData)
-                    if (version == None):
-                        version = getVersionJSON(b64decodedData)
+                    feature_lib = features_JSON
+
+                usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or feature_lib.usesListAtLevel(b64decodedData)
+                if (version == None):
+                    version = feature_lib.getVersion(b64decodedData)
 
             if userId == None:
                 userId = data["UserID"]
