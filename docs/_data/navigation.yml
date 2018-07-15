@@ -14,8 +14,8 @@ pages:
         url: /03-anatomy-of-a-query/03-reducers/        
   - title: Best practices for writing queries
     children:
-      - title: Using existing features
-        url: /04-writing-a-new-query/01-existing-features/
+      - title: Adding new reducers
+        url: /04-writing-a-new-query/01-new-reducers/
       - title: Adding new features
         url: /04-writing-a-new-query/02-new-features/
       - title: Adding new measurements
@@ -25,3 +25,5 @@ pages:
     children:
       - title: List of existing queries
         url: /05-appendix/01-list-of-existing-queries/
+      - title: Additional tools
+        url: /05-appendix/02-tools/

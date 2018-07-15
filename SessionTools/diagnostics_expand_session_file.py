@@ -14,10 +14,11 @@ import features_JSON
 import features_XML
 
 if len(sys.argv) != 2:
-    print ("Usage: python diagnostics_expand_session_file.py sorted_session file to expand")
+    print ("Usage: python diagnostics_expand_session_file.py sorted_session_file_to_expand")
 
 path = sys.argv[1]
 
+# Export the workspaces found to the current working directory?
 EXPORT_WORKSPACES = True
 
 f = gzip.open (path)
@@ -55,14 +56,14 @@ for ln in f:
 
     if data["Tag"] == "Workspace":
         if EXPORT_WORKSPACES:
-            if (b64decodedData.startswith("<")):
+            if (b64decodedData.startswith("<")):   # XML based
                 f_name = microtime + ".xml"
                 with open(f_name, 'w') as f_dump:
                     xml_dump = xml.dom.minidom.parseString(b64decodedData) 
                     pretty_xml_as_string = xml_dump.toprettyxml()
                     f_dump.write(pretty_xml_as_string.encode('utf-8'))
                     print ("Workspace exported:\t" + f_name)
-            elif (b64decodedData.startswith("{")):
+            elif (b64decodedData.startswith("{")): # JSON based
                 f_name = microtime + ".json"
                 with open(f_name, 'w') as f_dump:
                     json_dump = json.dumps(json.loads(b64decodedData), sort_keys=True, indent=2)
