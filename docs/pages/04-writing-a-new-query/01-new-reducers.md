@@ -1,7 +1,7 @@
 ---
 layout: page
-title: Writing a new query using existing features
-permalink: /04-writing-a-new-query/01-existing-features/
+title: Best practices for adding new reducers
+permalink: /04-writing-a-new-query/01-new-reducers/
 ---
 
 ## When you need to do this
