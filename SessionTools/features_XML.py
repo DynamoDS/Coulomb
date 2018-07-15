@@ -11,3 +11,20 @@ def usesListAtLevel(data):
     usesList = data.find('useLevels="True"') > -1
     return usesList
 
+def hasHiddenNodes(data):
+    return data.find('isVisible="false"') > -1
+
+def hasUpstreamHiddenNodes(data):
+    return data.find('isUpstreamVisible="false"') > -1
+
+def hasShortestLacing(data):
+    return data.find('lacing="Shortest"') > -1
+
+def hasLongestLacing(data):
+    return data.find('lacing="Longest"') > -1
+
+def hasPinned(data):
+    return data.find('isPinned="true"') > -1
+
+def hasFrozen(data):
+    return data.find('Frozen="true"') > -1  # This appears to be IsFrozen, which is case inconsistent with other features

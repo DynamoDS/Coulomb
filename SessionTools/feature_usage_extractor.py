@@ -1,7 +1,7 @@
 from __future__ import print_function
 
 import json
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as xmlElementTree
 import base64 
 import os
 import sys
@@ -27,6 +27,18 @@ path = sys.argv[1]
 
 paths = []
 
+def emptyFeatureUsageMap():
+    return {
+        "ListAtLevel": False,
+        "HiddenNodes": False,
+        "UpstreamHiddenNodes": False,
+        "ShortestLacing": False,
+        "LongestLacing": False,
+        "Pinned": False,
+        "Frozen": False
+    }
+
+
 i = 0
 
 print ('Enumerating files')
@@ -51,17 +63,17 @@ for path in paths:
     if os.path.exists(out_path) and os.path.getmtime(out_path) > os.path.getmtime(path):
         skipped = skipped + 1
         continue
-    
+
     try:
         f = gzip.open (path)
-        fo = open (out_path , 'w')
+        fo = open(out_path , 'w')
         processed = processed + 1
+        isJSON = False
         searchMap = {}
         searchNodeAdded = {}
         tags = set()
-        usageMap = { # When adding features here, don't forget to add below as well
-            "ListAtLevel": False
-        }
+        featureUsageMap = emptyFeatureUsageMap()
+        nodeUsageMap = {}
         userId = None
         version = None
         sessionStartMicroTime = 0
@@ -69,17 +81,22 @@ for path in paths:
         sessionDate = ''
 
         def writeDataToFile():
+            if isJSON: # Don't write results for JSON files for now
+                return 
+
             print (json.dumps(
                 {
                     "Searches" : searchMap,
                     "SearchesNodeAdded" : searchNodeAdded,
                     "Tags" : list(tags),
-                    "UsageMap" : usageMap,
+                    "FeatureUsageMap" : featureUsageMap,
+                    "NodeUsageMap" : nodeUsageMap,
                     "UserID": userId,
                     "WorkspaceVersion": version,
                     "SessionDuration": sessionEndMicroTime - sessionStartMicroTime,
                     "Date": sessionDate
                 }), file=fo)
+
         for ln in f:
             if ln.startswith("Downloading phase"):
                 continue
@@ -95,9 +112,8 @@ for path in paths:
                 searchMap = {}
                 searchNodeAdded = {}
                 tags = set()
-                usageMap = {
-                    "ListAtLevel": False
-                }
+                featureUsageMap = emptyFeatureUsageMap()
+                nodeUsageMap = {}
                 sessionStartMicroTime = int(data["MicroTime"])
                 sessionDate = data["DateTime"].split(" ")[0]
             sessionEndMicroTime = int(data["MicroTime"])
@@ -121,9 +137,33 @@ for path in paths:
                 if b64decodedData.startswith("<"):
                     feature_lib = features_XML
                 else:
-                    feature_lib = features_JSON
+                    isJSON = True
+                    print ("Skipping JSON based file: " + path)
+                    if os.path.exists(out_path):
+                        os.remove(out_path)
 
-                usageMap["ListAtLevel"] = usageMap["ListAtLevel"] or feature_lib.usesListAtLevel(b64decodedData)
+                    continue  # Skip JSON coded files for now
+                    # feature_lib = features_JSON
+
+                featureUsageMap["ListAtLevel"] = featureUsageMap["ListAtLevel"] or feature_lib.usesListAtLevel(b64decodedData)
+                featureUsageMap["HiddenNodes"] = featureUsageMap["HiddenNodes"] or feature_lib.hasHiddenNodes(b64decodedData)
+                featureUsageMap["UpstreamHiddenNodes"] = featureUsageMap["UpstreamHiddenNodes"] or feature_lib.hasUpstreamHiddenNodes(b64decodedData)
+                featureUsageMap["ShortestLacing"] = featureUsageMap["ShortestLacing"] or feature_lib.hasShortestLacing(b64decodedData)
+                featureUsageMap["LongestLacing"] = featureUsageMap["LongestLacing"] or feature_lib.hasLongestLacing(b64decodedData)
+                featureUsageMap["Pinned"] = featureUsageMap["Pinned"] or feature_lib.hasPinned(b64decodedData)
+                featureUsageMap["Frozen"] = featureUsageMap["Frozen"] or feature_lib.hasFrozen(b64decodedData)
+
+
+                # TOOD: Build the equiavalent to this for JSON
+                workspaceElement = xmlElementTree.fromstring(b64decodedData)
+                for element in workspaceElement.find('Elements'):
+                    if (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSFunction'):
+                        nodeUsageMap[element.attrib['function']] = True
+                    elif (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSVarArgFunction'):
+                        nodeUsageMap[element.attrib['function']] = True
+                    else:
+                        nodeUsageMap[element.attrib['type']] = True
+
                 if (version == None):
                     version = feature_lib.getVersion(b64decodedData)
 
