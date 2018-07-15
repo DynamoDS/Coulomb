@@ -4,7 +4,8 @@ title: Reducers
 permalink: /03-anatomy-of-a-query/03-reducers/
 ---
 
-** TODO: Description of the purpose **
+Reducers take the output of a condenser, transform and filter it so that it is easy to visualise.
+
 ** TODO: Location on the diagram **
 
 ## Input
@@ -21,9 +22,11 @@ permalink: /03-anatomy-of-a-query/03-reducers/
 ** TODO **
 
 
-In [How node feature usage works](/03-anatomy-of-a-query/01-how-node-feature-usage-works/) we looked at the [feature_usage_extractor.py](https://github.com/DynamoDS/Coulomb/blob/master/SessionTools/feature_usage_extractor.py) file. The next step in processing the data is to aggregate the files created by feature_usage_extractor.py into a single csv file. This is the feature_usage_merger.py.
+**TODO: Look again at whether this is best done with comments in code instead of narrative**
 
-In order to process the right files, the `VERSION` number between feature_distribution_extractor.py and feature_usage_merger.py must match.
+This example will show how to create a csv file for analysis and visualisation in Excel. This is the feature_reducer.py
+
+In order to process the right files, the `VERSION` number between feature_distribution_extractor.py and feature_reducer.py must match.
 
 ```python
 VERSION="2018-05-16" # this is the version of the feature_usage_extractor.py script
