@@ -6,7 +6,7 @@ permalink: /03-anatomy-of-a-query/
 
 The query infrastructure takes a set of session files as an input, and produces results that can be loaded in a spreadsheet for visualisation.
 
-(**TODO: Sub-part of the architecture diagram**)
+[![](/Coulomb/assets/instrumentation_pipeline_analysis.png)](/Coulomb/assets/instrumentation_pipeline_analysis.png)
 
 The total set of sessions is much too large to effectively visualise, however many queries can be written using broadly the same aggregated data. Consequently, the process of answering a query occurs in multiple parts:
 
