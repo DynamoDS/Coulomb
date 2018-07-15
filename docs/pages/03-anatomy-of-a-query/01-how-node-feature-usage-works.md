@@ -1,6 +1,6 @@
 ---
 layout: page
-title: How node feature usage works
+title: How the node usage feature extractor works
 permalink: /03-anatomy-of-a-query/01-how-node-feature-usage-works/
 ---
 
