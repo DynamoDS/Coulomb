@@ -1,8 +1,6 @@
 pages:
   - title: Instrumentation Handbook
     url: /about/
-  - title: What is instrumentation
-    url: /01-what-is-instrumentation/
   - title: Summary of instrumentation architecture
     url: /02-summary-of-instrumentation-architecture/
   - title: Anatomy of a query
