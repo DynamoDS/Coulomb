@@ -6,11 +6,11 @@ permalink: /03-anatomy-of-a-query/01-feature-extractors/
 
 Feature extractors refine the dataset, extracting properties of interest from each sorted session file. This allows subsequent analysis to be done interactively. 
 
-** TODO: Location on the diagram **
+**TODO: Location on the diagram**
 
 ## Input
 
-** Sorted session files **
+**Sorted session files**
 
 The directory structure that the data is organised in looks something like this:
 
@@ -48,7 +48,7 @@ The feature extractor will read the .sorted.gz files. Each line in thses files l
 
 ## Output
 
-** Feature files, 1 per feature extractor, per sorted session **
+**Feature files, 1 per feature extractor, per sorted session**
 
 For a feature called '2018-07-15', the result after the extractor has run would be:
 
