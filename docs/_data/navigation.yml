@@ -6,10 +6,13 @@ pages:
   - title: Anatomy of a query
     url: /03-anatomy-of-a-query/
     children:
-      - title: How node feature usage works
-        url: /03-anatomy-of-a-query/01-how-node-feature-usage-works/
-  - title: Writing a new query
-    # url: /04-best-practices-for-a-new-query/00-page/
+      - title: Feature extraction
+        url: /03-anatomy-of-a-query/01-feature-extractors/
+      - title: Condensers
+        url: /03-anatomy-of-a-query/02-condensers/
+      - title: Reducers
+        url: /03-anatomy-of-a-query/03-reducers/        
+  - title: Best practices for writing queries
     children:
       - title: Using existing features
         url: /04-writing-a-new-query/01-existing-features/
