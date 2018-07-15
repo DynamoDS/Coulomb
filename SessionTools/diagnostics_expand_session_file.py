@@ -18,7 +18,7 @@ if len(sys.argv) != 2:
 
 path = sys.argv[1]
 
-EXPORT_WORKSPACES = False
+EXPORT_WORKSPACES = True
 
 f = gzip.open (path)
 for ln in f:
@@ -55,11 +55,20 @@ for ln in f:
 
     if data["Tag"] == "Workspace":
         if EXPORT_WORKSPACES:
-            f_name = microtime + ".xml"
-            with open(f_name, 'w') as f_dump:
-                xml_dump = xml.dom.minidom.parseString(b64decodedData) 
-                pretty_xml_as_string = xml_dump.toprettyxml()
-                f_dump.write(pretty_xml_as_string.encode('utf-8'))
-                print ("Workspace exported:\t" + f_name)
+            if (b64decodedData.startswith("<")):
+                f_name = microtime + ".xml"
+                with open(f_name, 'w') as f_dump:
+                    xml_dump = xml.dom.minidom.parseString(b64decodedData) 
+                    pretty_xml_as_string = xml_dump.toprettyxml()
+                    f_dump.write(pretty_xml_as_string.encode('utf-8'))
+                    print ("Workspace exported:\t" + f_name)
+            elif (b64decodedData.startswith("{")):
+                f_name = microtime + ".json"
+                with open(f_name, 'w') as f_dump:
+                    json_dump = json.dumps(json.loads(b64decodedData), sort_keys=True, indent=2)
+                    f_dump.write(json_dump.encode('utf-8'))
+                    print ("Workspace exported:\t" + f_name)
+            else:
+                raise "Unknown workspace format"
 
     print ("~~~~~~~~~~~~~~~~~~~~~~~~")
