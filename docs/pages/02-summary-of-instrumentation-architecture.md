@@ -12,4 +12,4 @@ The technical design of the instrumentation system is made up of multiple compon
 
 The overall pipeline is shown in the figure below:
 
-![alt-text][/assets/instrumentation_pipeline.png]
+[![](/Coulomb/assets/instrumentation_pipeline.png)](/Coulomb/assets/instrumentation_pipeline.png)
