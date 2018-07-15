@@ -1,0 +1,26 @@
+pages:
+  - title: Instrumentation Handbook
+    url: /
+  - title: What is instrumentation
+    url: /pages/01-what-is-instrumentation/
+  - title: Summary of instrumentation architecture
+    url: /pages/02-summary-of-instrumentation-architecture/
+  - title: Anatomy of a query
+    url: /pages/03-anatomy-of-a-query/00-anatomy-of-a-query/
+    children:
+      - title: How node feature usage works
+        url: /pages/03-anatomy-of-a-query/01-how-node-feature-usage-works/
+  - title: Best practices for a new query
+    # url: /pages/04-best-practices-for-a-new-query/00-page/
+    children:
+      - title: From existing features
+        url: /pages/04-best-practices-for-a-new-query/01-from-existing-features/
+      - title: New features
+        url: /pages/04-best-practices-for-a-new-query/02-new-features/
+      - title: New measurements
+        url: /pages/04-best-practices-for-a-new-query/03-new-measurements/
+  - title: Appendix
+    # url: /pages/05-appendix/00-page/
+    children:
+      - title: List of existing queries
+        url: /pages/05-appendix/01-list-of-existing-queries/
