@@ -15,18 +15,22 @@ import sys
 import features_JSON
 import features_XML
     
-VERSION="2018-07-16"
+VERSION="2018-07-16"        # This is the name of the feature set, update it with any major changes
+
+# Progress counters
 processed = 0
 skipped = 0
 err_count = 0
+i = 0
+
 
 if len(sys.argv) != 2:
     print ("Usage: python feature_usage_extractor.py PathToSessions")
 
 path = sys.argv[1]
-
 paths = []
 
+# A list of all the usages features that are currently extracted
 def emptyFeatureUsageMap():
     return {
         "ListAtLevel": False,
@@ -42,8 +46,7 @@ def emptyFeatureUsageMap():
     }
 
 
-i = 0
-
+# Walk over the dataset computing a list of all the files to process
 print ('Enumerating files')
 for root, subdirs, files in os.walk(path):
     for ff in files:
@@ -55,13 +58,18 @@ for root, subdirs, files in os.walk(path):
             continue
         paths.append(path)
 
+# Randomise them in order to avoid collisions + leapfrogging problems with distributed workers
+# If processing locally removing this may slightly improve performance
 random.shuffle(paths)
-print ('Paths to process: ' + str(len(paths)))
 
-for path in paths:            
+print ('Paths to process: ' + str(len(paths)))
+for path in paths:
+    
+    # Report progress
     print (str(datetime.datetime.now()) + ": " + path + ": processed: " + str(processed) + ", errs: " + str(err_count) + ", results_exist: " + str(skipped) + ", total: " + str(processed + skipped) )
 
     out_path = path + ".features" + "." + VERSION
+
     # skip files that have been processed already
     if os.path.exists(out_path) and os.path.getmtime(out_path) > os.path.getmtime(path):
         skipped = skipped + 1
@@ -72,6 +80,8 @@ for path in paths:
         fo = open(out_path , 'w')
         processed = processed + 1
         isJSON = False
+
+        # Initialise structures for this day
         searchMap = {}
         searchNodeAdded = {}
         tags = set()
@@ -83,6 +93,8 @@ for path in paths:
         sessionEndMicroTime = 0
         sessionDate = ''
 
+        # Helper function to export data so far
+        # TODO: De-nest this function
         def writeDataToFile():
             if isJSON: # Don't write results for JSON files for now
                 return 
@@ -100,16 +112,22 @@ for path in paths:
                     "Date": sessionDate
                 }), file=fo)
 
+
+        # Process each line of the session file
         for ln in f:
-            if ln.startswith("Downloading phase"):
+            if ln.startswith("Downloading phase"): # Marker from the download script, ignore
                 continue
             data = json.loads(ln)
 
+            # Compute the first day
             if sessionStartMicroTime == 0:
                 sessionStartMicroTime = int(data["MicroTime"])
                 sessionDate = data["DateTime"].split(" ")[0]
+
+            # If a day has rolled over, export the data
             if sessionDate != data["DateTime"].split(" ")[0]:
                 print (path + " has session over multiple days")
+
                 # Split the session: write session so far to file, then reset data collection.
                 writeDataToFile()
                 searchMap = {}
@@ -121,18 +139,25 @@ for path in paths:
                 sessionDate = data["DateTime"].split(" ")[0]
             sessionEndMicroTime = int(data["MicroTime"])
 
+            # Keep track of what we've seen in the data file
             tags.add(data["Tag"])
+            
+            # Data is in base64 to protect against special characters, unpack it
             b64decodedData = base64.b64decode(data["Data"])
 
 
+            # Split what to do based on what kind of message this is
+            # Text entered into the search box
             if data["Tag"] == "Search":
                 searchMap[data["MicroTime"]] = b64decodedData
 
+            # A node being added to the canvas from the search UI
             if data["Tag"] == "Search-NodeAdded":
                 searchNodeAdded[data["MicroTime"]] = b64decodedData
 
+            # A workspace being reported
             if data["Tag"] == "Workspace":
-                if b64decodedData == '':
+                if b64decodedData == '':    # An empty workspace, ignore
                     continue
 
                 # Select which feature extraction library to use depending on what version on the file format 
@@ -148,6 +173,8 @@ for path in paths:
                     continue  # Skip JSON coded files for now
                     # feature_lib = features_JSON
 
+                
+                # Extract usage features from the workspace
                 featureUsageMap["ListAtLevel"] = featureUsageMap["ListAtLevel"] or feature_lib.usesListAtLevel(b64decodedData)
                 featureUsageMap["HiddenNodes"] = featureUsageMap["HiddenNodes"] or feature_lib.hasHiddenNodes(b64decodedData)
                 featureUsageMap["UpstreamHiddenNodes"] = featureUsageMap["UpstreamHiddenNodes"] or feature_lib.hasUpstreamHiddenNodes(b64decodedData)
@@ -176,21 +203,28 @@ for path in paths:
                         nodeUsageMap["CustomFunction: " + custom_node_best_name] = True
                     else:
                         nodeUsageMap[element.attrib['type']] = True
-
+                
+                # Extract version number (first time only)
                 if (version == None):
                     version = feature_lib.getVersion(b64decodedData)
 
+            # Extract user ID (first time only)
             if userId == None:
                 userId = data["UserID"]
     except Exception as e:
+        # If there were a problem, get the stack trace for what happeend
         exc_type, exc_value, exc_traceback = sys.exc_info()
+
+        # Log it
         print (e)
         print (path)
-
         traceback.print_tb(exc_traceback, file=sys.stdout)
+        
+        # Remove partial results
         fo.flush()
         os.remove(out_path)
         err_count = err_count + 1
         continue
 
+    # Flush any further data to the file
     writeDataToFile()
