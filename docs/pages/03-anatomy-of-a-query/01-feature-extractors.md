@@ -6,7 +6,7 @@ permalink: /03-anatomy-of-a-query/01-feature-extractors/
 
 Feature extractors refine the dataset, extracting properties of interest from each sorted session file. This allows subsequent analysis to be done interactively. 
 
-**TODO: Location on the diagram**
+[![](/Coulomb/assets/instrumentation_pipeline_feature_extractor.png)](/Coulomb/assets/instrumentation_pipeline_feature_extractor.png)
 
 ## Input
 
