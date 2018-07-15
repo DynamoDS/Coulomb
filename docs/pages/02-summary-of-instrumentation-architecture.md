@@ -13,3 +13,6 @@ The technical design of the instrumentation system is made up of multiple compon
 The overall pipeline is shown in the figure below:
 
 [![](/Coulomb/assets/instrumentation_pipeline.png)](/Coulomb/assets/instrumentation_pipeline.png)
+
+
+**TODO: One paragraph description of each of these phases, from original RoD documentation**
