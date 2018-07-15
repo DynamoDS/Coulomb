@@ -25,3 +25,5 @@ pages:
     children:
       - title: List of existing queries
         url: /05-appendix/01-list-of-existing-queries/
+      - title: Additional tools
+        url: /05-appendix/02-tools/
