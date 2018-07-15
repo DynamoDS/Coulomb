@@ -15,7 +15,7 @@ import sys
 import features_JSON
 import features_XML
     
-VERSION="2018-07-15"
+VERSION="2018-07-16"
 processed = 0
 skipped = 0
 err_count = 0
@@ -34,8 +34,11 @@ def emptyFeatureUsageMap():
         "UpstreamHiddenNodes": False,
         "ShortestLacing": False,
         "LongestLacing": False,
+        "DisabledLacing": False,
+        "CrossProductLacing": False,
         "Pinned": False,
-        "Frozen": False
+        "Frozen": False,
+        "CustomFunction": False
     }
 
 
@@ -150,6 +153,8 @@ for path in paths:
                 featureUsageMap["UpstreamHiddenNodes"] = featureUsageMap["UpstreamHiddenNodes"] or feature_lib.hasUpstreamHiddenNodes(b64decodedData)
                 featureUsageMap["ShortestLacing"] = featureUsageMap["ShortestLacing"] or feature_lib.hasShortestLacing(b64decodedData)
                 featureUsageMap["LongestLacing"] = featureUsageMap["LongestLacing"] or feature_lib.hasLongestLacing(b64decodedData)
+                featureUsageMap["DisabledLacing"] = featureUsageMap["DisabledLacing"] or feature_lib.hasDisabledLacing(b64decodedData)
+                featureUsageMap["CrossProductLacing"] = featureUsageMap["CrossProductLacing"] or feature_lib.hasCrossProductLacing(b64decodedData)
                 featureUsageMap["Pinned"] = featureUsageMap["Pinned"] or feature_lib.hasPinned(b64decodedData)
                 featureUsageMap["Frozen"] = featureUsageMap["Frozen"] or feature_lib.hasFrozen(b64decodedData)
 
@@ -158,9 +163,17 @@ for path in paths:
                 workspaceElement = xmlElementTree.fromstring(b64decodedData)
                 for element in workspaceElement.find('Elements'):
                     if (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSFunction'):
-                        nodeUsageMap[element.attrib['function']] = True
+                        lib_name = element.attrib['assembly'].split('\\')[-1]
+                        best_name = lib_name + ":" + element.attrib['function']
+                        nodeUsageMap[best_name] = True
                     elif (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSVarArgFunction'):
-                        nodeUsageMap[element.attrib['function']] = True
+                        lib_name = element.attrib['assembly'].split('\\')[-1]
+                        best_name = lib_name + ":" + element.attrib['function']
+                        nodeUsageMap[best_name] = True
+                    elif (element.tag == 'Dynamo.Graph.Nodes.CustomNodes.Function'):
+                        featureUsageMap["CustomFunction"] = True
+                        custom_node_best_name = element.attrib['nickname'] + " (" + element.find('ID').attrib["value"] + ")"
+                        nodeUsageMap["CustomFunction: " + custom_node_best_name] = True
                     else:
                         nodeUsageMap[element.attrib['type']] = True
 

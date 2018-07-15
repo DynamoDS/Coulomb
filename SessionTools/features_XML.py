@@ -23,8 +23,14 @@ def hasShortestLacing(data):
 def hasLongestLacing(data):
     return data.find('lacing="Longest"') > -1
 
+def hasDisabledLacing(data):
+    return data.find('lacing="Disabled"') > -1
+
+def hasCrossProductLacing(data):
+    return data.find('lacing="CrossProduct"') > -1
+
 def hasPinned(data):
     return data.find('isPinned="true"') > -1
 
 def hasFrozen(data):
-    return data.find('Frozen="true"') > -1  # This appears to be IsFrozen, which is case inconsistent with other features
+    return data.find('IsFrozen="true"') > -1  # sic IsFrozen
