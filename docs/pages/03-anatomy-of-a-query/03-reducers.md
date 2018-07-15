@@ -6,7 +6,7 @@ permalink: /03-anatomy-of-a-query/03-reducers/
 
 Reducers take the output of a condenser, transform and filter it so that it is easy to visualise.
 
-** TODO: Location on the diagram **
+[![](/Coulomb/assets/instrumentation_pipeline_reducer.png)](/Coulomb/assets/instrumentation_pipeline_reducer.png)
 
 ## Input
 
