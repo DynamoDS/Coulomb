@@ -12,7 +12,7 @@ The total set of sessions is much too large to effectively visualise, however ma
 
 1. [Feature Extractors](http://dynamods.github.io/Coulomb/03-anatomy-of-a-query/01-feature-extractors/) take the sorted sessions and compute the feature files summarising the information in a session (~1k hours of CPU/IO)
 2. [Condensers](http://dynamods.github.io/Coulomb/03-anatomy-of-a-query/02-condensers/) shuffle these summaries into a single file (~10 hours of CPU/IO)
-3.  [Reducers](http://dynamods.github.io/Coulomb/03-anatomy-of-a-query/02-reducers/) take these summaries and produces files that can be opened in visualisation tools such as spreadsheets (~10 seconds of CPU/IO)
+3.  [Reducers](http://dynamods.github.io/Coulomb/03-anatomy-of-a-query/03-reducers/) take these summaries and produces files that can be opened in visualisation tools such as spreadsheets (~10 seconds of CPU/IO)
 
  
  
