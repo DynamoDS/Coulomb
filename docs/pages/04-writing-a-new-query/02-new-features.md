@@ -6,9 +6,9 @@ permalink: /04-writing-a-new-query/02-new-features/
 
 ## When you need to do this
 
-New feature extractors are needed when the existing feature datasets do not contain the information needed to answer the question. For example, the features do not currently contain information about the spatial layout of the nodes, so if you wanted to kno whow spread out nodes typically are, then you'd need to write a new feature extractor.
+New feature extractors are needed when the existing feature datasets do not contain the information needed to answer the question. For example, the features do not currently contain information about the spatial layout of the nodes, so if you wanted to know how spread out nodes typically are, then you'd need to write a new feature extractor.
 
-It is preferable to add a new feature extractor than a new measurement,
+It is preferable to add a new feature extractor than a new measurement.
 
 
 ## Impact
@@ -22,12 +22,12 @@ The features must be incrementally computed for each update to the data.
 
 ## Design considerations
 
-  - To operate correctly feature extractors should be idempotent, and should in general complete in O(n) time
-  - It is strongly preferable for union of all the output of the feature extractors, decompressed, to fit in the RAM of a single workstation. Target is currently < 16Gb per feature set. This makes subsequent analysis much faster. 
+  - To operate correctly feature extractors, should be idempotent, and should in general complete in O(n) time
+  - It is strongly preferable that the union of all the output of the feature extractors, decompressed, to fit in the RAM of a single workstation. Target is currently < 16Gb per feature set. This makes subsequent analysis much faster.
   - As with all parts of infrastructure, reliable delivery of messages from the client cannot be assumed.
-  - Feature extractors must accept both XML and JSON sessions, it's not required to return results for both formats
+  - Feature extractors must accept both XML and JSON sessions and not crash, it's not required to return results for both formats
   - If the feature extractor encounters an error for a session, it's highly recomended to delete any previously reported results for that session. Otherwise the effect on the sampling can be very difficult to compute
-   
+
 ## Testing
 
   - Feature extractors must process unicode content correctly
