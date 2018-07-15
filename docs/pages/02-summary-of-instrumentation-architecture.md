@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Summary of instrumentation architecture
+permalink: /02-summary-of-instrumentation-architecture/
 ---
 
 The technical design of the instrumentation system is made up of multiple components:

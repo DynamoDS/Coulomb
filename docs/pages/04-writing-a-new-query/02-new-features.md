@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Best practices for a new query for new features
+permalink: /04-writing-a-new-query/02-new-features/
 ---
 
 This is some sample text.

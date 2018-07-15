@@ -1,6 +1,7 @@
 ---
 layout: page
 title: How node feature usage works
+permalink: /03-anatomy-of-a-query/01-how-node-feature-usage-works/
 ---
 
 A brief reminder from the [summary of the instrumentation architecture section](../02-summary-of-instrumentation-architecture/), the directory structure that the data is organised in looks something like this:

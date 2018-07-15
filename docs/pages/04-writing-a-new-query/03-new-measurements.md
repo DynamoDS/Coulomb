@@ -1,6 +1,7 @@
 ---
 layout: page
 title: Best practices for a new query for new measurements
+permalink: /04-writing-a-new-query/03-new-measurements/
 ---
 
 ## Here is a smaller heading
