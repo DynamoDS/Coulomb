@@ -35,7 +35,7 @@ def flush():
         sessions = feature_versions_map[k]
         feature_version = k
 
-        with open(out_full_path, 'wa') as f:
+        with open(out_full_path, 'a') as f:
             for session_id in sessions.keys():
                 data_to_dump = {
                     'feature_version' : feature_version,
