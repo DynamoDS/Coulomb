@@ -17,8 +17,8 @@ COMPLETED_DATA_FILES_BUCKET = "dynamo_instrumentation_archive_processed"
 SESSIONS_BUCKET = "dynamo_instrumentation_sessions"
 
 if len(sys.argv) != 3:
-    print "Usage: data_files_to_sessions data_files_temp_path session_files_temp_path"
-    print "Extract session files from the raw data"
+    print ("Usage: data_files_to_sessions data_files_temp_path session_files_temp_path")
+    print ("Extract session files from the raw data")
     exit(1)
 
 DATA_FILES_TEMP_PATH = sys.argv[1]
