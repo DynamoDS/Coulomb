@@ -97,6 +97,10 @@ def extract_features(blob_name, features_blob_name, temp_path):
 
     extract(blob_path_to_proc, out_path)
     log("Features extracted: {} => {}".format(blob_path_to_proc, out_path))
+
+    if not os.path.exists(out_path):
+        return False
+        
     upload_blob(FEATURES_BUCKET, out_path, features_blob_name)
 
     log("About to remove: {}".format(blob_path_to_proc))
