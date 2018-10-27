@@ -15,7 +15,7 @@ import random
 from storage_utils import download_blob, upload_blob, log, storage_client
 # import storage_utils
 
-MAX_MEM = 3 * 1000 * 1000 * 1000
+MAX_MEM = 2 * 1000 * 1000 * 1000
 
 SESSIONS_BUCKET = "dynamo_instrumentation_sessions"
 
