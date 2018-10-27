@@ -92,7 +92,6 @@ def sort_blob(blob_name, sorted_blob_name, temp_path):
 
         if byte_counter > MAX_MEM:
             skip_file = True
-            skipped +=1
             log ("Skipped large file: " + path)
             log ("Sorted: " + str(i) + ", skipped: " + str(skipped))
             break
