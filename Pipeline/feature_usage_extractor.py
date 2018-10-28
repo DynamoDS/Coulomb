@@ -15,6 +15,8 @@ import sys
 import features_JSON
 import features_XML
     
+VERSION="2018-10-28"
+
 # A list of all the usages features that are currently extracted
 def emptyFeatureUsageMap():
     return {
@@ -25,11 +27,13 @@ def emptyFeatureUsageMap():
         "LongestLacing": False,
         "DisabledLacing": False,
         "CrossProductLacing": False,
-        "CrossProductLacing": False,
         "AutoLacing": False,
+        "FirstLacing": False,
         "Pinned": False,
         "Frozen": False,
-        "CustomFunction": False
+        "CustomFunction": False,
+        "CodeBlockNode": False,
+        "PythonNode": False,
     }
 
 def extract(path, out_path):
@@ -53,8 +57,8 @@ def extract(path, out_path):
         # Helper function to export data so far
         # TODO: De-nest this function
         def writeDataToFile():
-            if isJSON: # Don't write results for JSON files for now
-                return 
+            # if isJSON: # Don't write results for JSON files for now
+                # return 
 
             print (json.dumps(
                 {
@@ -66,7 +70,8 @@ def extract(path, out_path):
                     "UserID": userId,
                     "WorkspaceVersion": version,
                     "SessionDuration": sessionEndMicroTime - sessionStartMicroTime,
-                    "Date": sessionDate
+                    "Date": sessionDate,
+                    "isJSON" : isJSON
                 }), file=fo)
 
 
@@ -87,7 +92,7 @@ def extract(path, out_path):
 
             # If a day has rolled over, export the data
             if sessionDate != data["DateTime"].split(" ")[0]:
-                print (path + " has session over multiple days")
+                # print (path + " has session over multiple days")
 
                 # Split the session: write session so far to file, then reset data collection.
                 writeDataToFile()
@@ -127,11 +132,12 @@ def extract(path, out_path):
                     feature_lib = features_XML
                 else:
                     isJSON = True
-                    print ("Skipping JSON based file: " + path)
-                    if os.path.exists(out_path):
-                        os.remove(out_path)
+                    feature_lib = features_JSON
+                    # print ("Skipping JSON based file: " + path)
+                    # if os.path.exists(out_path):
+                        # os.remove(out_path)
 
-                    continue  # Skip JSON coded files for now
+                    # continue  # Skip JSON coded files for now
                     # feature_lib = features_JSON
 
                 
@@ -149,24 +155,13 @@ def extract(path, out_path):
                 featureUsageMap["Pinned"] = featureUsageMap["Pinned"] or feature_lib.hasPinned(b64decodedData)
                 featureUsageMap["Frozen"] = featureUsageMap["Frozen"] or feature_lib.hasFrozen(b64decodedData)
 
-
-                # TOOD: Build the equiavalent to this for JSON
-                workspaceElement = xmlElementTree.fromstring(b64decodedData)
-                for element in workspaceElement.find('Elements'):
-                    if (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSFunction'):
-                        lib_name = element.attrib['assembly'].split('\\')[-1]
-                        best_name = lib_name + ":" + element.attrib['function']
-                        nodeUsageMap[best_name] = True
-                    elif (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSVarArgFunction'):
-                        lib_name = element.attrib['assembly'].split('\\')[-1]
-                        best_name = lib_name + ":" + element.attrib['function']
-                        nodeUsageMap[best_name] = True
-                    elif (element.tag == 'Dynamo.Graph.Nodes.CustomNodes.Function'):
-                        featureUsageMap["CustomFunction"] = True
-                        custom_node_best_name = element.attrib['nickname'] + " (" + element.find('ID').attrib["value"] + ")"
-                        nodeUsageMap["CustomFunction: " + custom_node_best_name] = True
-                    else:
-                        nodeUsageMap[element.attrib['type']] = True
+                featureUsageMap["CustomFunction"] = featureUsageMap["CustomFunction"] or feature_lib.hasCustomFunction(b64decodedData)
+                featureUsageMap["CodeBlockNode"] = featureUsageMap["CodeBlockNode"] or feature_lib.hasCodeBlockNode(b64decodedData)
+                featureUsageMap["PythonNode"] = featureUsageMap["PythonNode"] or feature_lib.hasPythonFunction(b64decodedData)
+                
+                updateToUsage = feature_lib.computeNodeUsageMap(b64decodedData)
+                # print(updateToUsage)
+                nodeUsageMap.update(updateToUsage)
                 
                 # Extract version number (first time only)
                 if (version == None):

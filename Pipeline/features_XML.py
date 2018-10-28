@@ -1,9 +1,9 @@
 # Feature extractors for XML files ( 0 < Dynamo < 2)
 
-import xml.etree.ElementTree as ET
+import xml.etree.ElementTree as xmlElementTree
 
 def getVersion(b64decodedData):
-    et = ET.fromstring(b64decodedData)
+    et = xmlElementTree.fromstring(b64decodedData)
     version = et.attrib["Version"]
     return version
 
@@ -40,3 +40,43 @@ def hasPinned(data):
 
 def hasFrozen(data):
     return data.find('IsFrozen="true"') > -1  # sic IsFrozen
+
+def hasCodeBlockNode(data):
+    workspaceElement = xmlElementTree.fromstring(data)
+    for element in workspaceElement.find('Elements'):
+        if (element.tag == 'Dynamo.Graph.Nodes.CodeBlockNodeModel'):
+            return True
+    return False
+
+def hasPythonFunction(data):
+    workspaceElement = xmlElementTree.fromstring(data)
+    for element in workspaceElement.find('Elements'):
+        if (element.tag == 'PythonNodeModels.PythonNode'):
+            return True
+    return False
+
+def hasCustomFunction(data):
+    workspaceElement = xmlElementTree.fromstring(data)
+    for element in workspaceElement.find('Elements'):
+        if (element.tag == 'Dynamo.Graph.Nodes.CustomNodes.Function'):
+            return True
+    return False
+
+def computeNodeUsageMap(data):
+    nodeUsageMap = {}
+    workspaceElement = xmlElementTree.fromstring(data)
+    for element in workspaceElement.find('Elements'):
+        if (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSFunction'):
+            lib_name = element.attrib['assembly'].split('\\')[-1]
+            best_name = lib_name + ":" + element.attrib['function']
+            nodeUsageMap[best_name] = True
+        elif (element.tag == 'Dynamo.Graph.Nodes.ZeroTouch.DSVarArgFunction'):
+            lib_name = element.attrib['assembly'].split('\\')[-1]
+            best_name = lib_name + ":" + element.attrib['function']
+            nodeUsageMap[best_name] = True
+        elif (element.tag == 'Dynamo.Graph.Nodes.CustomNodes.Function'):
+            custom_node_best_name = element.attrib['nickname'] + " (" + element.find('ID').attrib["value"] + ")"
+            nodeUsageMap["CustomFunction: " + custom_node_best_name] = True
+        else:
+            nodeUsageMap[element.attrib['type']] = True
+    return nodeUsageMap
