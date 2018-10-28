@@ -25,6 +25,8 @@ def emptyFeatureUsageMap():
         "LongestLacing": False,
         "DisabledLacing": False,
         "CrossProductLacing": False,
+        "CrossProductLacing": False,
+        "AutoLacing": False,
         "Pinned": False,
         "Frozen": False,
         "CustomFunction": False
@@ -141,6 +143,9 @@ def extract(path, out_path):
                 featureUsageMap["LongestLacing"] = featureUsageMap["LongestLacing"] or feature_lib.hasLongestLacing(b64decodedData)
                 featureUsageMap["DisabledLacing"] = featureUsageMap["DisabledLacing"] or feature_lib.hasDisabledLacing(b64decodedData)
                 featureUsageMap["CrossProductLacing"] = featureUsageMap["CrossProductLacing"] or feature_lib.hasCrossProductLacing(b64decodedData)
+                featureUsageMap["AutoLacing"] = featureUsageMap["AutoLacing"] or feature_lib.hasAutoLacing(b64decodedData)
+                featureUsageMap["FirstLacing"] = featureUsageMap["FirstLacing"] or feature_lib.hasFirstLacing(b64decodedData)
+                
                 featureUsageMap["Pinned"] = featureUsageMap["Pinned"] or feature_lib.hasPinned(b64decodedData)
                 featureUsageMap["Frozen"] = featureUsageMap["Frozen"] or feature_lib.hasFrozen(b64decodedData)
 

@@ -29,6 +29,12 @@ def hasDisabledLacing(data):
 def hasCrossProductLacing(data):
     return data.find('lacing="CrossProduct"') > -1
 
+def hasAutoLacing(data):
+    return False
+
+def hasFirstLacing(data):
+    return False
+
 def hasPinned(data):
     return data.find('isPinned="true"') > -1
 

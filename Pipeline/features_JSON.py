@@ -19,16 +19,22 @@ def hasUpstreamHiddenNodes(data):
     return False                                        # TODO
 
 def hasShortestLacing(data):
-    return False                                        # TODO
+    return data.find('"Replication": "Shortest"') > -1
 
 def hasLongestLacing(data):
-    return False                                        # TODO
+    return data.find('"Replication": "Longest"') > -1
 
 def hasDisabledLacing(data):
-    return data.find('"Replication": "Disabled"') > -1  # TO CONFIRM
+    return data.find('"Replication": "Disabled"') > -1
 
 def hasCrossProductLacing(data):
-    return False                                        # TODO
+    return data.find('"Replication": "CrossProduct"') > -1
+
+def hasAutoLacing(data):
+    return data.find('"Replication": "Auto"') > -1
+
+def hasFirstLacing(data):
+    return data.find('"Replication": "First"') > -1
 
 def hasPinned(data):
     return False                                        # TODO
