@@ -22,6 +22,8 @@ def extract(path, out_path):
         f = gzip.open (path)
         fo = open(out_path , 'w')
         stacktraces = []
+        userId = None
+        version = None
         sessionStartMicroTime = 0
 
         # Helper function to export data so far
