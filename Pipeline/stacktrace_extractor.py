@@ -29,7 +29,7 @@ def extract(path, out_path):
         def writeDataToFile():
             print (json.dumps(
                 {
-                    "StackTraces" : searchMap,
+                    "StackTraces" : stacktraces,
                     "UserID": userId,
                     "WorkspaceVersion": version,
                     "Date": sessionDate,
