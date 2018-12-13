@@ -16,9 +16,6 @@ from storage_utils import download_blob, upload_blob, log, storage_client
 from feature_usage_extractor import extract, VERSION
 # import storage_utils
 
-VERSION="2018-10-28"
-
-
 MAX_MEM = 1 * 1000 * 1000 * 1000
 
 SESSIONS_BUCKET = "dynamo_instrumentation_sessions"
